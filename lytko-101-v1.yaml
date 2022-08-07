@@ -1,24 +1,24 @@
 substitutions:
-  devicename:             "lytko" # Host name, will be available as ${devicename}.local
-  friendly_devicename:    "Lytko" # UI visible name, will be added to all sensors and controls exposed to HA
-  target_temperture_low:   "27.0" # Default low mark of the target temperature, can be changed from HA Thermostat GUI
-  target_temperture_high:  "29.0" # Default high mark of the target temperature, can be changed from HA Thermostat GUI
-                                  # Hysteresis is calculated as temperature_high - teplerature_low
-                                  # Target temperature is calculated as the middle point between temperature_high and teplerature_low
-                                  # Target temperture can be changed from Lytko screen
+  devicename:           "lytko101" # Host name, will be available as ${devicename}.local
+  friendly_devicename: "Lytko 101" # UI visible name, will be added to all sensors and controls exposed to HA
+  target_temperture_low:    "27.0" # Default low mark of the target temperature, can be changed from HA Thermostat GUI
+  target_temperture_high:   "29.0" # Default high mark of the target temperature, can be changed from HA Thermostat GUI
+                                   # Hysteresis is calculated as temperature_high - teplerature_low
+                                   # Target temperature is calculated as the middle point between temperature_high and teplerature_low
+                                   # Target temperture can be changed from Lytko screen
   # Compile time parameters
-  min_temperature:          "5.0" # Minimal temperature in HA Thermostat GUI
-  max_temperature:         "40.0" # Maximal temperature in HA Thermostat GUI
-  temperature_step:         "0.5" # Temperature step in HA Thermostat GUI
-  temperature_shift:        "0.0" # Constant shift (positive or negative) for the built in temperature sensor
-  temperature_sensor:   int_ntc   # Name of a temperature sensor. int_ntc is a built-in NTC sensor. If you want to hookup
-                                  # an external sensor using HA Sensor. See https://esphome.io/components/sensor/homeassistant.html
-                                  # Example sensor can be found below in the 'sensor' section 
+  min_temperature:           "5.0" # Minimal temperature in HA Thermostat GUI
+  max_temperature:          "40.0" # Maximal temperature in HA Thermostat GUI
+  temperature_step:          "0.5" # Temperature step in HA Thermostat GUI
+  temperature_shift:         "0.0" # Constant shift (positive or negative) for the built in temperature sensor
+  temperature_sensor:     int_ntc  # Name of a temperature sensor. int_ntc is a built-in NTC sensor. If you want to hookup
+                                   # an external sensor using HA Sensor. See https://esphome.io/components/sensor/homeassistant.html
+                                   # Example sensor can be found below in the 'sensor' section 
 
   # NTC Thermistor Parameters, see thermistor manual for the detailed info
-  ntc_beta_constant:       "3911" # NTC thermistor Beta coefficient
-  ntc_ref_temperature:       "25" # Temperature when thermistor has the reference resistance, in C
-  ntc_ref_resistance:     "10000" # Nominal / reference resistance of the attached thermistor in Ohms
+  ntc_beta_constant:        "3911" # NTC thermistor Beta coefficient
+  ntc_ref_temperature:        "25" # Temperature when thermistor has the reference resistance, in C
+  ntc_ref_resistance:      "10000" # Nominal / reference resistance of the attached thermistor in Ohms
 
 
 # This should point to the public location of this yaml file.
