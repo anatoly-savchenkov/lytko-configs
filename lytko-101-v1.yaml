@@ -27,7 +27,8 @@ dashboard_import:
 
 esphome:
   name: ${devicename}
-#  name_add_mac_suffix: true #TODO: enable for the final firmware
+  name_add_mac_suffix: true
+
   platformio_options:
     board_build.f_cpu: 160000000L
   project:
@@ -56,17 +57,6 @@ external_components:
 
   - source: github://pr#3662
     components: [ mdns ]
-
-#  - source:
-#      type: local
-#      path: ./esphome/esphome/components 
-#    components: [ nextion ]
-
-#  - source:
-#      type: local
-#      path: ./esphome-2022.6.2/esphome/components 
-#    components: [ web_server, web_server_base]
-
 
 esp8266:
   board: nodemcuv2
@@ -181,8 +171,6 @@ ota:
     - switch.turn_on: reboot
 
 wifi:
-  ssid: SWEET_HOME_CAMYUVABEACH
-
   ap: {} # This spawns an AP with the device name and mac address with no password.
   on_connect:
     - lambda: |-
