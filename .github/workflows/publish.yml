@@ -10,6 +10,6 @@ jobs:
     uses: esphome/workflows/.github/workflows/publish.yml@main
     with:
       # CHANGEME: Set the filenames of your config files here (comma separated):
-      files: lytko-101-v1.yaml
+      files: lytko-101-v1.yaml, lytko-101-headless-v1.yaml
       # CHANGEME: Set the name of your project here:
       name: Lytko ESPHome Configurations

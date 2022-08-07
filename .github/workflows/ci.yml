@@ -11,6 +11,7 @@ jobs:
       matrix:
         file:
           - lytko-101-v1.yaml
+          - lytko-101-headless-v1.yaml
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
