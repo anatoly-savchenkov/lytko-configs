@@ -13,7 +13,7 @@ substitutions:
   temperature_shift:         "0.0" # Constant shift (positive or negative) for the built in temperature sensor
   temperature_sensor:     int_ntc  # Name of a temperature sensor. int_ntc is a built-in NTC sensor. If you want to hookup
                                    # an external sensor using HA Sensor. See https://esphome.io/components/sensor/homeassistant.html
-                                   # Example sensor can be found below in the 'sensor' section 
+                                   # Example sensor can be found below in the 'sensor' section
 
   # NTC Thermistor Parameters, see thermistor manual for the detailed info
   ntc_beta_constant:        "3911" # NTC thermistor Beta coefficient
@@ -38,7 +38,7 @@ esphome:
     priority: -100
     then:
       - lambda: |-
-          id(boot_counter) += 1;  
+          id(boot_counter) += 1;
 
 external_components:
 #ESPHome 2022.06.02 + adds wifi.on_connect trigger and exposes AP structure to application (to get AP SSID for WiFi Config QR)
@@ -79,8 +79,7 @@ display:
   - platform: nextion
     id: disp
     uart_id: uart_nextion
-    update_interval: 60s
-    brightness: 0.01 # TODO: Doesn't work
+#    update_interval: 60s
     on_setup:
       lambda: |-
         if (wifi::global_wifi_component->has_sta()) {
@@ -92,6 +91,9 @@ display:
 
     on_page:
       lambda: |-
+        if(x == 0x08) id(disp).set_backlight_brightness(id(locked_brightness).state/100.0f);
+        else id(disp).set_backlight_brightness(1.0f);
+
         switch (x) {
           case 0x01: /* temperature */
             id(disp).set_component_value("signal_fill", id(wifi_level).state);
@@ -159,6 +161,7 @@ ota:
   on_begin:
     - lambda: |-
         id(disp).goto_page("upd_progress");
+        id(disp).set_backlight_brightness(1.0f);
   on_progress:
     - lambda: |-
         id(disp).set_component_value("update", (uint32_t)x);
@@ -215,6 +218,7 @@ globals:
 web_server:
   port: 80
   version: 2
+  local: true
 
 switch:
   - platform: gpio
@@ -243,7 +247,7 @@ binary_sensor:
           float step = traits.get_visual_temperature_step();
           float max_temp = traits.get_visual_max_temperature();
 
-          if (id(lytko_therm).target_temperature_high + step <= max_temp) { 
+          if (id(lytko_therm).target_temperature_high + step <= max_temp) {
             auto call = id(lytko_therm).make_call();
             call.set_target_temperature_high(id(lytko_therm).target_temperature_high + step);
             call.set_target_temperature_low(id(lytko_therm).target_temperature_low + step);
@@ -262,7 +266,7 @@ binary_sensor:
           float step = traits.get_visual_temperature_step();
           float min_temp = traits.get_visual_min_temperature();
 
-          if (id(lytko_therm).target_temperature_low - step >= min_temp) { 
+          if (id(lytko_therm).target_temperature_low - step >= min_temp) {
             auto call = id(lytko_therm).make_call();
             call.set_target_temperature_high(id(lytko_therm).target_temperature_high - step);
             call.set_target_temperature_low(id(lytko_therm).target_temperature_low - step);
@@ -439,7 +443,7 @@ sensor:
     name: ${friendly_devicename} Temperature
     accuracy_decimals: 1
     state_class: measurement
-    device_class: temperature    
+    device_class: temperature
     unit_of_measurement: "°C"
     id: int_ntc
     filters:
@@ -455,7 +459,7 @@ sensor:
 
   - platform: adc
     id: voltage_sensor
-    pin: A0   
+    pin: A0
     update_interval: 1s
     internal: true
     filters:
@@ -507,3 +511,17 @@ climate:
           id(disp).set_component_value("H_active", is_on);
           id(disp).set_component_text_printf("degree_big", "%.1f", (id(lytko_therm).target_temperature_high + id(lytko_therm).target_temperature_low) / 2.0f);
           id(disp).set_component_text_printf("degree", "%.1f", id(lytko_therm).current_temperature);
+
+number:
+  - platform: template
+    name: ${friendly_devicename} Locked Screen Brightness
+    id: locked_brightness
+    min_value: 0
+    max_value: 100
+    step: 1
+    optimistic: true
+    restore_value: true
+    entity_category: config
+    unit_of_measurement: '%'
+    mode: slider
+
