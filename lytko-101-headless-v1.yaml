@@ -13,7 +13,7 @@ substitutions:
   temperature_shift:         "0.0" # Constant shift (positive or negative) for the built in temperature sensor
   temperature_sensor:     int_ntc  # Name of a temperature sensor. int_ntc is a built-in NTC sensor. If you want to hookup
                                    # an external sensor using HA Sensor. See https://esphome.io/components/sensor/homeassistant.html
-                                   # Example sensor can be found below in the 'sensor' section 
+                                   # Example sensor can be found below in the 'sensor' section
 
   # NTC Thermistor Parameters, see thermistor manual for the detailed info
   ntc_beta_constant:        "3911" # NTC thermistor Beta coefficient
@@ -38,7 +38,7 @@ esphome:
     priority: -100
     then:
       - lambda: |-
-          id(boot_counter) += 1;  
+          id(boot_counter) += 1;
 
 external_components:
   - source: github://pr#3662
@@ -99,6 +99,7 @@ globals:
 web_server:
   port: 80
   version: 2
+  local: true
 
 switch:
   - platform: gpio
@@ -199,7 +200,7 @@ sensor:
     name: ${friendly_devicename} Temperature
     accuracy_decimals: 1
     state_class: measurement
-    device_class: temperature    
+    device_class: temperature
     unit_of_measurement: "°C"
     id: int_ntc
     filters:
@@ -215,7 +216,7 @@ sensor:
 
   - platform: adc
     id: voltage_sensor
-    pin: A0   
+    pin: A0
     update_interval: 1s
     internal: true
     filters:
