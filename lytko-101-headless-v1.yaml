@@ -44,6 +44,9 @@ external_components:
   - source: github://pr#3662
     components: [ mdns ]
 
+  - source: github://pr#3610
+    components: [ sensor ]
+
 esp8266:
   board: nodemcuv2
   restore_from_flash: true
@@ -54,13 +57,6 @@ esp8266:
 logger:
   baud_rate: 74880
   level: VERBOSE
-
-uart:
-  id: uart_nextion
-  rx_pin: GPIO5
-  tx_pin: GPIO4
-  baud_rate: 9600
-
 
 debug:
 
@@ -223,6 +219,9 @@ sensor:
     update_interval: 1s
     internal: true
     filters:
+      - lambda: |-
+          /* 10 bit ADC, readouts below 4 are considered noise, NTC is not connected */
+          return (x < 4.0f/1024 ? NAN : x );
       - exponential_moving_average:
           alpha: 0.1
           send_every: 10
