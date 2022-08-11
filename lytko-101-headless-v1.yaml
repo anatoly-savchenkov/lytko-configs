@@ -30,7 +30,7 @@ esphome:
   name_add_mac_suffix: true
 
   platformio_options:
-    board_build.f_cpu: 80000000L
+    board_build.f_cpu: 160000000L
   project:
     name: "Lytko.Thermostat-101-Headless-v1"
     version: "1.0"
@@ -46,6 +46,9 @@ external_components:
 
   - source: github://pr#3610
     components: [ sensor ]
+
+  - source: github://pr#3706
+    components: [ web_server]
 
 esp8266:
   board: nodemcuv2
