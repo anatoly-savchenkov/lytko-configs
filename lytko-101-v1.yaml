@@ -41,28 +41,19 @@ esphome:
           id(boot_counter) += 1;
 
 external_components:
-#ESPHome 2022.06.02 + adds wifi.on_connect trigger and exposes AP structure to application (to get AP SSID for WiFi Config QR)
+#ESPHome 2022.8.0 + wifi.on_connect trigger
   - source:
       type: git
       url: https://github.com/anatoly-savchenkov/esphome
       ref: lytko_wifi
     components: [ wifi ]
 
-#ESPHome 2022.06.02 + works around soft UART issue with lower loging levels and adds on_page() notification
+#ESPHome 2022.8.0 + work around for soft UART issue
   - source:
       type: git
       url: https://github.com/anatoly-savchenkov/esphome
       ref: lytko_nextion
     components: [ nextion ]
-
-  - source: github://pr#3662
-    components: [ mdns ]
-
-  - source: github://pr#3610
-    components: [ sensor ]
-
-  - source: github://pr#3706
-    components: [ web_server]
 
 esp8266:
   board: nodemcuv2
@@ -240,6 +231,9 @@ switch:
   - platform: restart
     name: ${friendly_devicename} Restart
     id: reboot
+
+  - platform: safe_mode
+    name: ${friendly_devicename} Restart (Safe Mode)
 
 binary_sensor:
   - platform: status
@@ -480,6 +474,18 @@ sensor:
           alpha: 0.1
           send_every: 10
           send_first_at: 1
+
+  - platform: template
+    name: ${friendly_devicename} Reference Resistance
+    accuracy_decimals: 0
+    unit_of_measurement: "Ω"
+    entity_category: config
+    update_interval: 60s
+    icon: "mdi:flash"
+    lambda: |-
+      return ${ntc_ref_resistance};
+    filters:
+      - delta: 0.1 # Prevent repetitive actions using the same value
 
 output:
   - platform: esp8266_pwm
