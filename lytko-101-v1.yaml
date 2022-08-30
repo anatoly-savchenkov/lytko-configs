@@ -19,7 +19,14 @@ substitutions:
   ntc_beta_constant:        "3911" # NTC thermistor Beta coefficient
   ntc_ref_temperature:        "25" # Temperature when thermistor has the reference resistance, in C
   ntc_ref_resistance:      "10000" # Nominal / reference resistance of the attached thermistor in Ohms
+  ntc_measurement_resistor: "2200" # Measurement resistor, board has 2.2kOhm resistor, if you add another 2.2kOms resistor as described
+                                   # in the Lytko manual, it will have parallel connection to the board resistor, so
+                                   # the value of 1100 should be put here. Calculate as parallely connected resistors in case another
+                                   # nominal is used
 
+  # Heating floor parameters
+  floor_resistance:        "813.8" # Resistance of heating cable / matt in Ohm
+  floor_mains_voltage:       "230" # Typical mains voltage of your system (better to use a value from smart meter via HA, see below
 
 # This should point to the public location of this yaml file.
 dashboard_import:
@@ -40,8 +47,11 @@ esphome:
       - lambda: |-
           id(boot_counter) += 1;
 
+preferences:
+  flash_write_interval: 1h
+
 external_components:
-#ESPHome 2022.8.0 + wifi.on_connect trigger
+#ESPHome 2022.8.0 + wifi.on_connect trigger + start scanning in AP only mode
   - source:
       type: git
       url: https://github.com/anatoly-savchenkov/esphome
@@ -83,6 +93,7 @@ display:
           id(disp).goto_page("loading_page");
         } else {
           id(disp).goto_page("config_wifi");
+          id(qr_presented) = true;
         }
         id(disp).set_component_value("temperature.lock_mode", id(child_lock));
 
@@ -157,6 +168,7 @@ display:
         }
 
 debug:
+  update_interval: 5s
 
 ota:
   on_begin:
@@ -179,6 +191,7 @@ wifi:
   on_connect:
     - lambda: |-
         id(disp).goto_page("temperature");
+        id(qr_presented) = false;
   on_disconnect:
     - lambda: |-
         id(disp).goto_page("no_wifi_page");
@@ -215,11 +228,35 @@ globals:
    type: bool
    restore_value: yes
    initial_value: 'false'
+ - id: qr_presented
+   type: bool
+   restore_value: no
+   initial_value: 'false'
 
 web_server:
   port: 80
   version: 2
   local: true
+
+interval:
+  - interval: 10s
+    then:
+      - if:
+          condition:
+            for:
+              time: 65s # rely on 60 seconds default ap_timeout value and add 5 seconds to start Fallback AP
+              condition:
+                not:
+                  - wifi.connected:
+          then:
+            if:
+              condition:
+                - lambda: return !id(qr_presented);
+              then:
+              - logger.log: WiFi is not connected for 1 minute, show WiFi configuration QR code
+              - lambda: |-
+                  id(disp).goto_page("config_wifi");
+                  id(qr_presented) = true;
 
 switch:
   - platform: gpio
@@ -414,6 +451,7 @@ sensor:
         else if (-83.0f > x && x >= -94.0f) { level = 0; id(rssi_level).set_icon("mdi:wifi-strength-outline");}
         else                                { level =-1; id(rssi_level).set_icon("mdi:wifi-strength-off-outline");}
         id(wifi_level).publish_state(level);
+
   - platform: debug
     free:
       id: free_heap
@@ -458,7 +496,7 @@ sensor:
     id: resistance_sensor
     sensor: voltage_sensor
     configuration: UPSTREAM
-    resistor: 2.2kOhm
+    resistor: ${ntc_measurement_resistor}
     internal: true
 
   - platform: adc
@@ -486,6 +524,56 @@ sensor:
       return ${ntc_ref_resistance};
     filters:
       - delta: 0.1 # Prevent repetitive actions using the same value
+
+  - platform: template
+    update_interval: 1s
+    internal: true
+    id: mains_voltage
+    state_class: measurement
+    device_class: voltage
+    icon: "mdi:flash"
+    lambda: |-
+      return ${floor_mains_voltage};
+    filters:
+      - delta: 0.01 # Prevent repetitive actions using the same value
+
+# If Smart Meter is available, uncomment the sensor below and comment out template sensor above
+# Get current mains voltage from a smart meter
+#  - platform: homeassistant
+#    id: mains_voltage
+#    entity_id: sensor.pzem_004t_v3_voltage
+#    internal: true
+#    filters:
+#      - filter_out: nan
+#      - delta: 0.01 # Prevent repetitive actions using the same value
+
+  - platform: template
+    update_interval: 1s
+    internal: true
+    name: ${friendly_devicename} Power
+    id: floor_power
+    state_class: measurement
+    device_class: power
+    accuracy_decimals: 0
+    unit_of_measurement: "W"
+    icon: "mdi:flash"
+    lambda: |-
+      return id(heater).state * powf(id(mains_voltage).state, 2.0f) / ${floor_resistance};
+    filters:
+      - delta: 0.01 # Prevent repetitive actions using the same value
+
+  - platform: integration
+    name: ${friendly_devicename} Energy
+    sensor: floor_power
+    time_unit: h
+    restore: true
+    accuracy_decimals: 3
+    unit_of_measurement: "kWh"
+    icon: "mdi:flash"
+    device_class: energy
+    state_class: total_increasing
+    filters:
+      - multiply: 0.001 # Wh to kWh
 
 output:
   - platform: esp8266_pwm

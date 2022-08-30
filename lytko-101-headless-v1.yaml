@@ -19,7 +19,14 @@ substitutions:
   ntc_beta_constant:        "3911" # NTC thermistor Beta coefficient
   ntc_ref_temperature:        "25" # Temperature when thermistor has the reference resistance, in C
   ntc_ref_resistance:      "10000" # Nominal / reference resistance of the attached thermistor in Ohms
+  ntc_measurement_resistor: "2200" # Measurement resistor, board has 2.2kOhm resistor, if you add another 2.2kOms resistor as described
+                                   # in the Lytko manual, it will have parallel connection to the board resistor, so
+                                   # the value of 1100 should be put here. Calculate as parallely connected resistors in case another
+                                   # nominal is used
 
+  # Heating floor parameters
+  floor_resistance:        "813.8" # Resistance of heating cable / matt in Ohm
+  floor_mains_voltage:       "230" # Typical mains voltage of your system (better to use a value from smart meter via HA, see below
 
 # This should point to the public location of this yaml file.
 dashboard_import:
@@ -40,6 +47,17 @@ esphome:
       - lambda: |-
           id(boot_counter) += 1;
 
+preferences:
+  flash_write_interval: 1h
+
+external_components:
+#ESPHome 2022.8.0 + wifi.on_connect trigger + start scanning in AP only mode
+  - source:
+      type: git
+      url: https://github.com/anatoly-savchenkov/esphome
+      ref: lytko_wifi
+    components: [ wifi ]
+
 esp8266:
   board: nodemcuv2
   restore_from_flash: true
@@ -52,6 +70,7 @@ logger:
   level: VERBOSE
 
 debug:
+  update_interval: 5s
 
 ota:
   on_error:
@@ -207,7 +226,7 @@ sensor:
     id: resistance_sensor
     sensor: voltage_sensor
     configuration: UPSTREAM
-    resistor: 2.2kOhm
+    resistor: ${ntc_measurement_resistor}
     internal: true
 
   - platform: adc
@@ -235,6 +254,56 @@ sensor:
       return ${ntc_ref_resistance};
     filters:
       - delta: 0.1 # Prevent repetitive actions using the same value
+
+  - platform: template
+    update_interval: 1s
+    internal: true
+    id: mains_voltage
+    state_class: measurement
+    device_class: voltage
+    icon: "mdi:flash"
+    lambda: |-
+      return ${floor_mains_voltage};
+    filters:
+      - delta: 0.01 # Prevent repetitive actions using the same value
+
+# If Smart Meter is available, uncomment the sensor below and comment out template sensor above
+# Get current mains voltage from a smart meter
+#  - platform: homeassistant
+#    id: mains_voltage
+#    entity_id: sensor.pzem_004t_v3_voltage
+#    internal: true
+#    filters:
+#      - filter_out: nan
+#      - delta: 0.01 # Prevent repetitive actions using the same value
+
+  - platform: template
+    update_interval: 1s
+    internal: true
+    name: ${friendly_devicename} Power
+    id: floor_power
+    state_class: measurement
+    device_class: power
+    accuracy_decimals: 0
+    unit_of_measurement: "W"
+    icon: "mdi:flash"
+    lambda: |-
+      return id(heater).state * powf(id(mains_voltage).state, 2.0f) / ${floor_resistance};
+    filters:
+      - delta: 0.01 # Prevent repetitive actions using the same value
+
+  - platform: integration
+    name: ${friendly_devicename} Energy
+    sensor: floor_power
+    time_unit: h
+    restore: true
+    accuracy_decimals: 3
+    unit_of_measurement: "kWh"
+    icon: "mdi:flash"
+    device_class: energy
+    state_class: total_increasing
+    filters:
+      - multiply: 0.001 # Wh to kWh
 
 output:
   - platform: esp8266_pwm
