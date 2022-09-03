@@ -58,6 +58,9 @@ external_components:
       ref: lytko_wifi
     components: [ wifi ]
 
+  - source: github://pr#3767
+    components: [ integration ]
+
 esp8266:
   board: nodemcuv2
   restore_from_flash: true
@@ -236,8 +239,8 @@ sensor:
     internal: true
     filters:
       - lambda: |-
-          /* 10 bit ADC, readouts below 4 are considered noise, NTC is not connected */
-          return (x < 4.0f/1024 ? NAN : x );
+          /* 10 bit ADC, readouts below 10 (1%) are considered noise, NTC is not connected */
+          return (x < 10.0f/1024 ? NAN : x );
       - exponential_moving_average:
           alpha: 0.1
           send_every: 10
@@ -288,14 +291,13 @@ sensor:
     unit_of_measurement: "W"
     icon: "mdi:flash"
     lambda: |-
-      return id(heater).state * powf(id(mains_voltage).state, 2.0f) / ${floor_resistance};
-    filters:
-      - delta: 0.01 # Prevent repetitive actions using the same value
+      return id(heater).state * id(mains_voltage).state * id(mains_voltage).state / (float)${floor_resistance};
 
   - platform: integration
     name: ${friendly_devicename} Energy
     sensor: floor_power
     time_unit: h
+    integration_method: left
     restore: true
     accuracy_decimals: 3
     unit_of_measurement: "kWh"
