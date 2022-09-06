@@ -2,7 +2,7 @@
   "chipFamily": "ESP8266",
   "parts": [
     {
-      "path": "lytko101-esp8266/lytko101-esp8266.bin",
+      "path": "lytko101v1-esp8266/lytko101v1-esp8266.bin",
       "offset": 0
     }
   ]
