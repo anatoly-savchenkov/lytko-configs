@@ -1,6 +1,6 @@
 substitutions:
-  devicename:           "lytko101" # Host name, will be available as ${devicename}.local
-  friendly_devicename: "Lytko 101" # UI visible name, will be added to all sensors and controls exposed to HA
+  devicename:         "lytko101v1" # Host name, will be available as ${devicename}.local
+  friendly_devicename:  "Bathroom" # UI visible name, will be added to all sensors and controls exposed to HA
   target_temperture_low:    "27.0" # Default low mark of the target temperature, can be changed from HA Thermostat GUI
   target_temperture_high:   "29.0" # Default high mark of the target temperature, can be changed from HA Thermostat GUI
                                    # Hysteresis is calculated as temperature_high - teplerature_low
@@ -58,7 +58,7 @@ external_components:
       ref: lytko_wifi
     components: [ wifi ]
 
-#ESPHome 2022.8.0 + work around for soft UART issue
+#ESPHome 2022.8.0 + work around for soft UART issue + no bogus command during connect
   - source:
       type: git
       url: https://github.com/anatoly-savchenkov/esphome
@@ -517,7 +517,7 @@ sensor:
           send_first_at: 1
 
   - platform: template
-    name: ${friendly_devicename} Reference Resistance
+    name: ${friendly_devicename} NTC Reference Resistance
     accuracy_decimals: 0
     unit_of_measurement: "Ω"
     entity_category: config
@@ -525,6 +525,18 @@ sensor:
     icon: "mdi:flash"
     lambda: |-
       return ${ntc_ref_resistance};
+    filters:
+      - delta: 0.1 # Prevent repetitive actions using the same value
+
+  - platform: template
+    name: ${friendly_devicename} Heating Resistance
+    accuracy_decimals: 1
+    unit_of_measurement: "Ω"
+    entity_category: config
+    update_interval: 60s
+    icon: "mdi:heat-wave"
+    lambda: |-
+      return ${floor_resistance};
     filters:
       - delta: 0.1 # Prevent repetitive actions using the same value
 
@@ -632,6 +644,7 @@ number:
     min_value: 0
     max_value: 100
     step: 1
+    icon: mdi:brightness-percent
     optimistic: true
     restore_value: true
     entity_category: config

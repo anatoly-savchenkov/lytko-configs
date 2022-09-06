@@ -1,6 +1,6 @@
 substitutions:
   devicename:        "lytko101-hl" # Host name, will be available as ${devicename}.local
-  friendly_devicename: "Lytko 101" # UI visible name, will be added to all sensors and controls exposed to HA
+  friendly_devicename:  "Bathroom" # UI visible name, will be added to all sensors and controls exposed to HA
   target_temperture_low:    "27.0" # Default low mark of the target temperature, can be changed from HA Thermostat GUI
   target_temperture_high:   "29.0" # Default high mark of the target temperature, can be changed from HA Thermostat GUI
                                    # Hysteresis is calculated as temperature_high - teplerature_low
@@ -247,7 +247,7 @@ sensor:
           send_first_at: 1
 
   - platform: template
-    name: ${friendly_devicename} Reference Resistance
+    name: ${friendly_devicename} NTC Reference Resistance
     accuracy_decimals: 0
     unit_of_measurement: "Ω"
     entity_category: config
@@ -257,6 +257,19 @@ sensor:
       return ${ntc_ref_resistance};
     filters:
       - delta: 0.1 # Prevent repetitive actions using the same value
+
+  - platform: template
+    name: ${friendly_devicename} Heating Resistance
+    accuracy_decimals: 1
+    unit_of_measurement: "Ω"
+    entity_category: config
+    update_interval: 60s
+    icon: "mdi:heat-wave"
+    lambda: |-
+      return ${floor_resistance};
+    filters:
+      - delta: 0.1 # Prevent repetitive actions using the same value
+
 
   - platform: template
     update_interval: 1s
