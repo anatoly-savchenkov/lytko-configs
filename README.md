@@ -1,6 +1,8 @@
 # Lytko ESPHome Configurations
 
-This repository contains ESPHome configurations for [Lytko](https://lytko.com) devices. Pick a configuration / pre-built firmware which corresponds to your device. Please make sure ESPHome 2022.9.0 or newer is used in case you need to recompile the firmware (yes, that's exactly how you'll use it).  
+This repository contains ESPHome configurations for [Lytko](https://lytko.com) devices. Pick a configuration / pre-built firmware which corresponds to your device. Please make sure ESPHome 2022.9.0 or newer is used in case you need to recompile the firmware (yes, that's exactly how you'll use it).
+
+Refer to the [installation manual (RUS)](/docs/installation.rus.md) to convert your Lytko device into a ESPHome based one.
 
 ## Lytko 101 Headless Thermostat
 
