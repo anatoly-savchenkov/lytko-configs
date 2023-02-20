@@ -99,13 +99,13 @@ pip install esptool
 [<u>https://aliexpress.ru/item/4000216010101.html</u>](https://aliexpress.ru/item/4000216010101.html).
 
 <img src="./media/image3.jpg"
-style="width:6.72847in;height:6.72847in" />
+style="width:25%;height:25%" />
 
 Подключать UART нужно к 6-ти пиновому разъёму, см.
 фото.
 
 <img src="./media/image2.jpg"
-style="width:6.71875in;height:6.60417in" />
+style="width:50%;height:50%" />
 
 Нам нужны 4 контакта: 5V (он
 же Vсс), TX, RX, GND. Эти же контакты вы найдёте на USB to UART
@@ -230,7 +230,7 @@ YAML файл в этом случае нужно будет вручную ск
 Примерно вот так выглядит Web интерфейс настройки термостата в случае ESPHome прошивки.
 
 <img src="./media/image1.png"
-style="width:6.72847in;height:2.69444in" />
+style="width:75%;height:75%" />
 
 # Ограничение текущей версии
 
