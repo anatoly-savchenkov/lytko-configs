@@ -30,7 +30,8 @@ substitutions:
 
 # This should point to the public location of this yaml file.
 dashboard_import:
-  package_import_url: github://anatoly-savchenkov/lytko-configs/lytko-101-v1.yaml
+  package_import_url: github://anatoly-savchenkov/lytko-configs/lytko-101-v1.yaml@main
+  import_full_config: true
 
 esphome:
   name: ${devicename}
@@ -51,22 +52,20 @@ preferences:
   flash_write_interval: 1h
 
 external_components:
-#ESPHome 2022.8.0 + wifi.on_connect trigger + start scanning in AP only mode
+#ESPHome 2022.12.0 + wifi.on_connect trigger
   - source:
       type: git
-      url: https://github.com/anatoly-savchenkov/esphome
-      ref: lytko_wifi
+      url: https://github.com/ChemicalXandco/esphome
+      ref: wifi-on-connected
     components: [ wifi ]
 
-#ESPHome 2022.8.0 + work around for soft UART issue + no bogus command during connect
+#ESPHome 2022.12.0 + work around for soft UART issue + no bogus command during connect
   - source:
       type: git
       url: https://github.com/anatoly-savchenkov/esphome
       ref: lytko_nextion
     components: [ nextion ]
 
-  - source: github://pr#3767
-    components: [ integration ]
 
 esp8266:
   board: nodemcuv2
@@ -210,7 +209,7 @@ api:
   reboot_timeout: 0s
 
 time:
-  - platform: sntp
+  - platform: homeassistant
 
 #mqtt:
 #  broker: 192.168.0.101
@@ -272,8 +271,9 @@ switch:
     name: ${friendly_devicename} Restart
     id: reboot
 
-  - platform: safe_mode
-    name: ${friendly_devicename} Restart (Safe Mode)
+  - platform: factory_reset
+    name: ${friendly_devicename} Factory Reset
+    id: reset
 
 binary_sensor:
   - platform: status
@@ -288,7 +288,7 @@ binary_sensor:
     on_press:
       - lambda: |-
           auto traits = id(lytko_therm).get_traits();
-          float step = traits.get_visual_temperature_step();
+          float step = traits.get_visual_target_temperature_step();
           float max_temp = traits.get_visual_max_temperature();
 
           if (id(lytko_therm).target_temperature_high + step <= max_temp) {
@@ -307,7 +307,7 @@ binary_sensor:
     on_press:
       - lambda: |-
           auto traits = id(lytko_therm).get_traits();
-          float step = traits.get_visual_temperature_step();
+          float step = traits.get_visual_target_temperature_step();
           float min_temp = traits.get_visual_min_temperature();
 
           if (id(lytko_therm).target_temperature_low - step >= min_temp) {
@@ -348,8 +348,7 @@ binary_sensor:
     internal: true
     id: n_reset
     on_press:
-      # TODO: Clean up RCT and flash area used for preferences
-      - switch.turn_on: reboot
+      - switch.turn_on: reset
 
   - platform: nextion
     page_id: 0x06

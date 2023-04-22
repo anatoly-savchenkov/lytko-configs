@@ -30,7 +30,8 @@ substitutions:
 
 # This should point to the public location of this yaml file.
 dashboard_import:
-  package_import_url: github://anatoly-savchenkov/lytko-configs/lytko-101-headless-v1.yaml
+  package_import_url: github://anatoly-savchenkov/lytko-configs/lytko-101-headless-v1.yaml@main
+  import_full_config: true
 
 esphome:
   name: ${devicename}
@@ -51,15 +52,12 @@ preferences:
   flash_write_interval: 1h
 
 external_components:
-#ESPHome 2022.8.0 + wifi.on_connect trigger + start scanning in AP only mode
+#ESPHome 2022.12.0 + wifi.on_connect trigger
   - source:
       type: git
-      url: https://github.com/anatoly-savchenkov/esphome
-      ref: lytko_wifi
+      url: https://github.com/ChemicalXandco/esphome
+      ref: wifi-on-connected
     components: [ wifi ]
-
-  - source: github://pr#3767
-    components: [ integration ]
 
 esp8266:
   board: nodemcuv2
@@ -93,7 +91,7 @@ api:
   reboot_timeout: 0s
 
 time:
-  - platform: sntp
+  - platform: homeassistant
 
 #mqtt:
 #  broker: 192.168.0.101
@@ -127,8 +125,9 @@ switch:
     name: ${friendly_devicename} Restart
     id: reboot
 
-  - platform: safe_mode
-    name: ${friendly_devicename} Restart (Safe Mode)
+  - platform: factory_reset
+    name: ${friendly_devicename} Factory Reset
+    id: reset
 
 binary_sensor:
   - platform: status
@@ -269,7 +268,6 @@ sensor:
       return ${floor_resistance};
     filters:
       - delta: 0.1 # Prevent repetitive actions using the same value
-
 
   - platform: template
     update_interval: 1s
