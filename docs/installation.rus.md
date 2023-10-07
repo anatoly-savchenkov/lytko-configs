@@ -102,13 +102,20 @@ pip install esptool
 style="width:25%;height:25%" />
 
 Подключать UART нужно к 6-ти пиновому разъёму, см.
-фото.
+фото. Первое фото для v1 термостата, второе - для v2.
 
-<img src="./media/image2.jpg"
-style="width:50%;height:50%" />
+<img src="./media/image2.jpg" alt="Lytko 101 version 1 PCB"
+style="width:33%;height:33%" />
+<img src="../picts/lytko101v2_pcb.jpg" alt="Lytko 101 version 2 PCB"
+style="width:33%;height:33%" />
 
-Нам нужны 4 контакта: 5V (он
-же Vсс), TX, RX, GND. Эти же контакты вы найдёте на USB to UART
+Для версии 2 печатной платы (с разъемом) удобно использовать коннектор SMD JST SH 1.0 мм на 6 контактов.
+Например, можно купить [<u>тут</u>](https://www.aliexpress.us/item/3256802776818037.html).
+
+<img src="./media/connector.jpg" alt="SMD JST SH 1.0 mm connector"
+style="width:33%;height:33%" />
+
+Нам нужны 4 контакта: 5V (он же Vсс), TX, RX, GND. Эти же контакты вы найдёте на USB to UART
 переходнике. Соединяем Vcc с 5V, GND с GND, TX с RX и RX c TX (да, тут
 опечатки нет). Если будете использовать другой адаптер, то перепутанная
 маркировка RX/TX – частое явление, попробуйте поменять местами, если не
