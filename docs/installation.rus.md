@@ -170,7 +170,7 @@ esptool erase_flash
 ```
 а потом уже прошивать ESPHome версию
 ```
-esptool -b 460800 write_flash 0x0 0x400000 firmware.bin
+esptool -b 460800 write_flash 0x0 firmware.bin
 ```
 После каждого действия плату надо перезапускать и заново входить в режим
 UART flasher. Или можно попробовать добавить опцию --after no\_reset. Но
