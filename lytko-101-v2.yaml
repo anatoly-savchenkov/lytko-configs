@@ -519,7 +519,6 @@ sensor:
     name: ${friendly_devicename} NTC Reference Resistance
     accuracy_decimals: 0
     unit_of_measurement: "Ω"
-    entity_category: config
     update_interval: 60s
     icon: "mdi:flash"
     lambda: |-
@@ -531,7 +530,6 @@ sensor:
     name: ${friendly_devicename} Heating Resistance
     accuracy_decimals: 1
     unit_of_measurement: "Ω"
-    entity_category: config
     update_interval: 60s
     icon: "mdi:heat-wave"
     lambda: |-
