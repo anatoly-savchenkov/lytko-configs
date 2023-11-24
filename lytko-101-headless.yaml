@@ -30,7 +30,7 @@ substitutions:
 
 # This should point to the public location of this yaml file.
 dashboard_import:
-  package_import_url: github://anatoly-savchenkov/lytko-configs/lytko-101-headless-v1.yaml@main
+  package_import_url: github://anatoly-savchenkov/lytko-configs/lytko-101-headless.yaml@main
   import_full_config: true
 
 esphome:
