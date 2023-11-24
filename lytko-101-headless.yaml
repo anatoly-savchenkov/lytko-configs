@@ -51,14 +51,6 @@ esphome:
 preferences:
   flash_write_interval: 1h
 
-external_components:
-#ESPHome 2022.12.0 + wifi.on_connect trigger
-  - source:
-      type: git
-      url: https://github.com/ChemicalXandco/esphome
-      ref: wifi-on-connected
-    components: [ wifi ]
-
 esp8266:
   board: nodemcuv2
   restore_from_flash: true
